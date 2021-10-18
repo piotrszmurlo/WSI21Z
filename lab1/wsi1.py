@@ -25,24 +25,25 @@ def steepest_descent(x0, alfa, precision, f, gf):
 
 def main():
     f = lambda x: x**4 - 5 * x**2 - 3*x
-    gf = lambda x: 4*x**3 - 10*x + 3
+    gf = lambda x: 4*x**3 - 10*x - 3
 
     # f = lambda x: x**2 +3*x +8
     # gf = lambda x: 2*x+3
 
-    alfa = 0.015
-    x0 = 0.1
+    alfa = 0.15
+    x0 = 0
     result = steepest_descent(x0,alfa, 0.001, f, gf)
 
     # for i in np.arange(0.01, 0.05, 0.005):
     #     print('wynik: ' + str(steepest_descent(-3,i, 0.001, f, gf)[0]) + f'; alfa: {i}; kroki: {str(steepest_descent(-3,i, 0.001, f, gf)[3])}')
+
     print("result: " + str(result[0]))
     print("steps: "+ str(result[3]))
     x = np.arange(-3, 3, 0.1)
     y = f(x)
     plt.plot(x,y)
-    # plt.title(f"y=x^4 - 5x^2 - 3x, alfa={alfa}, x0={x0}, kroki: {result[3]}")
-    plt.title(f"y = x^2 + 3x + 8, alfa={alfa}, x0={x0}, kroki: {result[3]}")
+    plt.title(f"y=x^4 - 5x^2 - 3x, alfa={alfa}, x0={x0}, kroki: {result[3]}")
+    # plt.title(f"y = x^2 + 3x + 8, alfa={alfa}, x0={x0}, kroki: {result[3]}")
     plt.xlabel("x")
     plt.ylabel("y")
     plt.scatter(result[1], result[2])
