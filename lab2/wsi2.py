@@ -1,16 +1,18 @@
 from random import gauss, randint, random
 import numpy as np
 from numpy.core.numeric import cross
+import matplotlib.pyplot as plt
 
 
 def find_minimum(iterations, population_size, tournament_size=2, elite_size=1, alfa=0.1, sigma=0.1, mutation_p=0.5, cross_p=0.5):
     f = lambda x: x**2
     upp_bound = 10
-    low_bound = -10
+    low_bound = 8
     population = np.random.uniform(low_bound, upp_bound, population_size)
     best_point = min(population, key=lambda x: x**2)
     i = 0
     R_population = np.array([])
+    pts = population.copy()
     while i < iterations:
         R_population = tournament_select(population, tournament_size)
         M_population = cross_and_mutate(R_population, mutation_p, cross_p, alfa, sigma)
@@ -24,7 +26,12 @@ def find_minimum(iterations, population_size, tournament_size=2, elite_size=1, a
         population = np.concatenate((population[:elite_size], M_population))
         population = np.array(sorted(population, key=lambda x: x**2))
         population = population[:population_size]
+        pts = np.concatenate((pts, population))
         i += 1
+    pts = np.unique(pts)
+    ys = pts**2
+    plt.scatter(pts, ys)
+    
     return best_point
 
 
@@ -81,9 +88,11 @@ def main():
     # population = population[:population_size]
     # print(len(population) == population_size)
 
-
-
+    x = np.linspace(-10,10,200)
+    y= x**2
+    plt.plot(x, y)
     print(find_minimum(iterations, population_size, tournament_size, elite_size, alfa, sigma, mutation_p, cross_p))
+    plt.show()
 
 
 if __name__ == "__main__":
