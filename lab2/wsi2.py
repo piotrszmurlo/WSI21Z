@@ -1,5 +1,6 @@
 from random import gauss, randint, random
 import numpy as np
+from numpy.core.numeric import cross
 
 
 def find_minimum(iterations, population_size, tournament_size=2, elite_size=1, alfa=0.1, sigma=0.1, mutation_p=0.5, cross_p=0.5):
@@ -16,7 +17,13 @@ def find_minimum(iterations, population_size, tournament_size=2, elite_size=1, a
         new_best_point = min(M_population, key=lambda x: x**2)
         if f(new_best_point) < f(best_point):
             best_point = new_best_point
-        population = np.unique(np.concatenate((population[:elite_size], M_population)))[:-elite_size]
+        population = np.array(sorted(population, key=lambda x: x**2))
+        # population = np.concatenate((population[:elite_size], np.array([e for e in M_population if e not in population[:elite_size]])))[:-elite_size]
+        # population = np.unique(np.concatenate((population[:elite_size], M_population)))[:-elite_size]
+        # population = np.concatenate((population[:elite_size], np.array([e for e in M_population if e not in population[:elite_size]])))[:population.size]
+        population = np.concatenate((population[:elite_size], M_population))
+        population = np.array(sorted(population, key=lambda x: x**2))
+        population = population[:population_size]
         i += 1
     return best_point
 
@@ -58,14 +65,24 @@ def cross_and_mutate(population, mutation_p, cross_p, alfa, sigma) -> np.ndarray
 
 def main():
     iterations = 500
-    population_size = 20
+    population_size = 200
     tournament_size=2
     elite_size=1
     alfa=0.1
     sigma=0.1
-    mutation_p=1
-    cross_p=0
-    population = np.random.uniform(-10, 10, population_size)
+    mutation_p=0.1
+    cross_p=0.5
+    # population = np.random.uniform(-10, 10, population_size)
+    # population = np.array(sorted(population, key=lambda x: x**2))
+    # M_population = cross_and_mutate(population, mutation_p, cross_p, alfa, sigma)
+    # print(population)
+    # population = np.concatenate((population[:elite_size], M_population))
+    # population = np.array(sorted(population, key=lambda x: x**2))
+    # population = population[:population_size]
+    # print(len(population) == population_size)
+
+
+
     print(find_minimum(iterations, population_size, tournament_size, elite_size, alfa, sigma, mutation_p, cross_p))
 
 
