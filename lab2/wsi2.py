@@ -84,7 +84,6 @@ def find_minimum(iterations, population_size, func, dim, tournament_size=2, elit
         if func(new_best_point) < func(best_point):
             best_point = new_best_point
         population = np.array(sorted(population, key=func))
-        # population = np.concatenate((population[:elite_size], np.array([e for e in M_population if e not in population[:elite_size]])))[:-elite_size]
         population = np.concatenate((population[:elite_size], M_population))
         population = np.array(sorted(population, key=func))
         population = population[:population_size]
