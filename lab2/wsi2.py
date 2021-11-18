@@ -22,7 +22,7 @@ def main():
     }
 
     iterations = 500
-    population_size = 100
+    population_size = 50
     tournament_size=2
     elite_size=1
     alfa=0.1
@@ -32,7 +32,7 @@ def main():
     clones_start = False
     upp_bound = 2*np.pi
     low_bound = -2*np.pi
-    func = funcs['shubert']
+    func = funcs['bird']
 
 
     dim = func[1]
