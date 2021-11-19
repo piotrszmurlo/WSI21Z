@@ -38,6 +38,7 @@ class TicTacToe:
     
     def max_move(self, depth_max):
         possible_moves = self.get_possible_moves(self.current_board)
+        print(f'max: {possible_moves}')
         next_boards = []
         for possible_move in possible_moves:
             next_board = self.current_board.copy()
@@ -46,7 +47,7 @@ class TicTacToe:
             values = []
         for next_board in next_boards:
             val = self.minimax(next_board, depth_max, False)
-            print(val)
+            print(f'max: {val}')
             values.append(val)
         final_choice = values.index(max(values)) 
         self.current_board[possible_moves[final_choice][0]][[possible_moves[final_choice][1]]] = 1
@@ -54,6 +55,7 @@ class TicTacToe:
 
     def min_move(self, depth_min):
         possible_moves = self.get_possible_moves(self.current_board)
+        print(f'min: {possible_moves}')
         next_boards = []
         for possible_move in possible_moves:
             next_board = self.current_board.copy()
@@ -61,7 +63,9 @@ class TicTacToe:
             next_boards.append(next_board)
             values = []
         for next_board in next_boards:
-            values.append(self.minimax(next_board, depth_min, True))
+            val = self.minimax(next_board, depth_min, True)
+            print(f'min: {val}')
+            values.append(val)
         final_choice = values.index(max(values)) 
         self.current_board[possible_moves[final_choice][0]][[possible_moves[final_choice][1]]] = -1
         self.max_turn = False
@@ -137,7 +141,7 @@ class TicTacToe:
             print(li[i])
         print('') 
 def main():
-    game = TicTacToe(3, 2)
+    game = TicTacToe(2, 2)
     game.play()
     # game.max_move(9)
 
