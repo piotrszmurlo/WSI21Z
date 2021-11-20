@@ -1,4 +1,5 @@
 import numpy as np
+from random import randint
 
 class TicTacToe:
     def __init__(self, depth_max, depth_min):
@@ -28,8 +29,8 @@ class TicTacToe:
                 values.append(value)
             max_val = max(values)
             final_choice = values.index(max_val)
-            # if depth == self.depth_max: 
-                # print(f'max: {values}')
+            if depth == self.depth_max: 
+                print(f'max: {values}')
             return (max_val, possible_moves[final_choice])
         else:
             for next_board in next_boards:
@@ -37,8 +38,8 @@ class TicTacToe:
                 values.append(value)
             min_val = min(values)
             final_choice = values.index(min_val)
-            # if depth == self.depth_min: 
-                # print(f'min: {values}')            
+            if depth == self.depth_min: 
+                print(f'min: {values}')            
             # print(f'min: {min(values)}')
             return (min_val, possible_moves[final_choice])
     
@@ -50,18 +51,28 @@ class TicTacToe:
             self.current_board[move[0]][move[1]] = 1 if is_max else -1
 
     def max_move(self, depth_max):
-        if depth_max != 0:
+        if depth_max > 0:
             val, move = self.minimax(self.current_board, depth_max, True)
+            # print(val)
             self.current_board[move[0]][move[1]] = 1
-        else:
+        elif depth_max == 0:
             self.zero_depth_move(True)
+        else:
+            possible_moves = self.get_possible_moves(self.current_board)
+            i = randint(0, possible_moves.size)
+            self.current_board[possible_moves[i][0]][possible_moves[i][1]] = -1
 
     def min_move(self, depth_min):
-        if depth_min != 0:
+        if depth_min > 0:
             val, move = self.minimax(self.current_board, depth_min, False)
+            # print(val)
             self.current_board[move[0]][move[1]] = -1
-        else:
+        elif depth_min == 0:
             self.zero_depth_move(False)
+        else:
+            possible_moves = self.get_possible_moves(self.current_board)
+            i = randint(0, len(possible_moves))
+            self.current_board[possible_moves[i][0]][possible_moves[i][1]] = -1
         
 
     def evaluate_board(self, board):
@@ -135,7 +146,7 @@ class TicTacToe:
             print(li[i])
         print('') 
 def main():
-    game = TicTacToe(9, 5)
+    game = TicTacToe(9, 3)
     game.play()
 
 if __name__ == '__main__':
