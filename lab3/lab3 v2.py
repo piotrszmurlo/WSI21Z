@@ -6,13 +6,12 @@ class TicTacToe:
         # self.current_board =  np.array([[1,1,0],[0,0,0], [0,0,0]])
         self.depth_max = depth_max
         self.depth_min = depth_min
-        self.max_turn = True
         self.evaluation_board = np.array([[3, 2, 3],[2, 4, 2], [3, 2, 3]])
         self.win_board = np.array([[4, 9, 2], [3, 5, 7], [8, 1, 6]])
 
     def minimax(self, board, depth, is_maximizing):
         if self.is_over(board) or depth == 0:
-            return self.evaluate_board(board)
+            return (self.evaluate_board(board), None)
         possible_moves = self.get_possible_moves(board)
         next_boards = []
         for possible_move in possible_moves:
@@ -25,50 +24,32 @@ class TicTacToe:
         values = []
         if is_maximizing:
             for next_board in next_boards:
-                value = self.minimax(next_board, depth - 1, False)
+                value, _a = self.minimax(next_board, depth - 1, False)
                 values.append(value)
-            # print(f'max: {max(values)}')
-            return max(values)
+            max_val = max(values)
+            final_choice = values.index(max_val)
+            # if depth == self.depth_max: 
+                # print(f'max: {values}')
+            return (max_val, possible_moves[final_choice])
         else:
             for next_board in next_boards:
-                value = self.minimax(next_board, depth - 1, True)
+                value, _a = self.minimax(next_board, depth - 1, True)
                 values.append(value)
+            min_val = min(values)
+            final_choice = values.index(min_val)
+            # if depth == self.depth_min: 
+                # print(f'min: {values}')            
             # print(f'min: {min(values)}')
-            return min(values)
+            return (min_val, possible_moves[final_choice])
     
     def max_move(self, depth_max):
-        possible_moves = self.get_possible_moves(self.current_board)
-        print(f'max: {possible_moves}')
-        next_boards = []
-        for possible_move in possible_moves:
-            next_board = self.current_board.copy()
-            next_board[possible_move[0]][possible_move[1]] = 1
-            next_boards.append(next_board)
-            values = []
-        for next_board in next_boards:
-            val = self.minimax(next_board, depth_max, False)
-            print(f'max: {val}')
-            values.append(val)
-        final_choice = values.index(max(values)) 
-        self.current_board[possible_moves[final_choice][0]][[possible_moves[final_choice][1]]] = 1
-        self.max_turn = False
-
+        val, move = self.minimax(self.current_board, depth_max, True)
+        # print(f'max: {val}')
+        self.current_board[move[0]][move[1]] = 1
     def min_move(self, depth_min):
-        possible_moves = self.get_possible_moves(self.current_board)
-        print(f'min: {possible_moves}')
-        next_boards = []
-        for possible_move in possible_moves:
-            next_board = self.current_board.copy()
-            next_board[possible_move[0]][possible_move[1]] = -1
-            next_boards.append(next_board)
-            values = []
-        for next_board in next_boards:
-            val = self.minimax(next_board, depth_min, True)
-            print(f'min: {val}')
-            values.append(val)
-        final_choice = values.index(max(values)) 
-        self.current_board[possible_moves[final_choice][0]][[possible_moves[final_choice][1]]] = -1
-        self.max_turn = False
+        val, move = self.minimax(self.current_board, depth_min, False)
+        # print(f'min: {val}')
+        self.current_board[move[0]][move[1]] = -1 
         
 
     def evaluate_board(self, board):
@@ -94,6 +75,7 @@ class TicTacToe:
                 return -1000
             if scoreboard.trace() == -15:
                 return -1000
+            return 0
         else:
             return sum(sum(board * self.evaluation_board))
 
@@ -141,7 +123,7 @@ class TicTacToe:
             print(li[i])
         print('') 
 def main():
-    game = TicTacToe(2, 2)
+    game = TicTacToe(3, 6)
     game.play()
     # game.max_move(9)
 
