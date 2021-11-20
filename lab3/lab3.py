@@ -42,14 +42,26 @@ class TicTacToe:
             # print(f'min: {min(values)}')
             return (min_val, possible_moves[final_choice])
     
+    def zero_depth_move(self, is_max):
+            choice_board = self.evaluation_board*(1 - abs(self.current_board))
+            max_val = max(choice_board.flatten())
+            best_moves = np.where(choice_board == max_val)
+            move = np.column_stack((best_moves[0], best_moves[1]))[0]
+            self.current_board[move[0]][move[1]] = 1 if is_max else -1
+
     def max_move(self, depth_max):
-        val, move = self.minimax(self.current_board, depth_max, True)
-        # print(f'max: {val}')
-        self.current_board[move[0]][move[1]] = 1
+        if depth_max != 0:
+            val, move = self.minimax(self.current_board, depth_max, True)
+            self.current_board[move[0]][move[1]] = 1
+        else:
+            self.zero_depth_move(True)
+
     def min_move(self, depth_min):
-        val, move = self.minimax(self.current_board, depth_min, False)
-        # print(f'min: {val}')
-        self.current_board[move[0]][move[1]] = -1 
+        if depth_min != 0:
+            val, move = self.minimax(self.current_board, depth_min, False)
+            self.current_board[move[0]][move[1]] = -1
+        else:
+            self.zero_depth_move(False)
         
 
     def evaluate_board(self, board):
@@ -123,9 +135,8 @@ class TicTacToe:
             print(li[i])
         print('') 
 def main():
-    game = TicTacToe(3, 6)
+    game = TicTacToe(9, 5)
     game.play()
-    # game.max_move(9)
 
 if __name__ == '__main__':
     main()
