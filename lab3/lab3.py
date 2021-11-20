@@ -3,12 +3,15 @@ from random import randint
 
 class TicTacToe:
     def __init__(self, depth_max, depth_min):
+        self.states_checked_max = 0
+        self.states_checked_min = 0
         self.current_board = np.full((3, 3), 0)
-        # self.current_board =  np.array([[1,1,0],[0,0,0], [0,0,0]])
+        # self.current_board =  np.array([[0,0,0],[0,1,0], [0,0,0]])
         self.depth_max = depth_max
         self.depth_min = depth_min
         self.evaluation_board = np.array([[3, 2, 3],[2, 4, 2], [3, 2, 3]])
         self.win_board = np.array([[4, 9, 2], [3, 5, 7], [8, 1, 6]])
+        self.max_turn = True
 
     def minimax(self, board, depth, is_maximizing):
         if self.is_over(board) or depth == 0:
@@ -22,6 +25,10 @@ class TicTacToe:
             else:
                 next_board[possible_move[0]][possible_move[1]] = -1
             next_boards.append(next_board)
+            if self.max_turn:
+                self.states_checked_max = self.states_checked_max + 1
+            else:
+                self.states_checked_min = self.states_checked_min + 1
         values = []
         if is_maximizing:
             for next_board in next_boards:
@@ -59,8 +66,9 @@ class TicTacToe:
             self.zero_depth_move(True)
         else:
             possible_moves = self.get_possible_moves(self.current_board)
-            i = randint(0, possible_moves.size)
+            i = randint(0, len(possible_moves))
             self.current_board[possible_moves[i][0]][possible_moves[i][1]] = -1
+        self.max_turn = False
 
     def min_move(self, depth_min):
         if depth_min > 0:
@@ -73,6 +81,8 @@ class TicTacToe:
             possible_moves = self.get_possible_moves(self.current_board)
             i = randint(0, len(possible_moves))
             self.current_board[possible_moves[i][0]][possible_moves[i][1]] = -1
+        self.max_turn = True
+        
         
 
     def evaluate_board(self, board):
@@ -124,13 +134,15 @@ class TicTacToe:
 
     def play(self):
         while not self.is_over(self.current_board):
-            self.max_move(self.depth_max)
+            self.min_move(self.depth_min)
             # print(self.evaluate_board(self.current_board))
             self.print_board() 
             if not self.is_over(self.current_board):
-                self.min_move(self.depth_min)
+                self.max_move(self.depth_max)
                 # print(self.evaluate_board(self.current_board))
                 self.print_board() 
+        print(f'max states: {self.states_checked_max}')
+        print(f'min states: {self.states_checked_min}')
 
     def print_board(self):
         li = [[' ',' ',' '], [' ',' ',' '], [' ',' ',' ']]
@@ -146,7 +158,7 @@ class TicTacToe:
             print(li[i])
         print('') 
 def main():
-    game = TicTacToe(9, 3)
+    game = TicTacToe(5, 3)
     game.play()
 
 if __name__ == '__main__':
