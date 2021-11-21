@@ -6,11 +6,9 @@ class TicTacToe:
         self.states_checked_max = 0
         self.states_checked_min = 0
         self.current_board = np.full((3, 3), 0)
-        # self.current_board =  np.array([[0,0,0],[0,1,0], [0,0,0]])
         self.depth_max = depth_max
         self.depth_min = depth_min
         self.evaluation_board = np.array([[3, 2, 3],[2, 4, 2], [3, 2, 3]])
-        self.win_board = np.array([[4, 9, 2], [3, 5, 7], [8, 1, 6]])
         self.max_turn = True
 
     def minimax(self, board, depth, is_maximizing):
@@ -47,7 +45,6 @@ class TicTacToe:
             final_choice = values.index(min_val)
             if depth == self.depth_min: 
                 print(f'min: {values}')            
-            # print(f'min: {min(values)}')
             return (min_val, possible_moves[final_choice])
     
     def zero_depth_move(self, is_max):
@@ -60,7 +57,6 @@ class TicTacToe:
     def max_move(self, depth_max):
         if depth_max > 0:
             val, move = self.minimax(self.current_board, depth_max, True)
-            # print(val)
             self.current_board[move[0]][move[1]] = 1
         elif depth_max == 0:
             self.zero_depth_move(True)
@@ -73,7 +69,6 @@ class TicTacToe:
     def min_move(self, depth_min):
         if depth_min > 0:
             val, move = self.minimax(self.current_board, depth_min, False)
-            # print(val)
             self.current_board[move[0]][move[1]] = -1
         elif depth_min == 0:
             self.zero_depth_move(False)
@@ -87,42 +82,40 @@ class TicTacToe:
 
     def evaluate_board(self, board):
         if self.is_over(board):
-            scoreboard = board * self.win_board
-            for row in scoreboard:
-                if sum(row) == 15:
+            for row in board:
+                if sum(row) == 3:
                     return 1000
-            for col in scoreboard.T:
-                if sum(col) == 15:
+            for col in board.T:
+                if sum(col) == 3:
                     return 1000
-            if np.trace(np.flipud(scoreboard)) == 15:
+            if np.trace(np.flipud(board)) == 3:
                 return 1000
-            if scoreboard.trace() == 15:
+            if board.trace() == 3:
                 return 1000
-            for row in scoreboard:
-                if sum(row) == -15:
+            for row in board:
+                if sum(row) == -3:
                     return -1000
-            for col in scoreboard.T:
-                if sum(col) == -15:
+            for col in board.T:
+                if sum(col) == -3:
                     return -1000
-            if np.trace(np.flipud(scoreboard)) == -15:
+            if np.trace(np.flipud(board)) == -3:
                 return -1000
-            if scoreboard.trace() == -15:
+            if board.trace() == -3:
                 return -1000
             return 0
         else:
             return sum(sum(board * self.evaluation_board))
 
     def is_over(self, board):
-        scoreboard = board * self.win_board
-        for row in scoreboard:
-            if abs(sum(row)) == 15:
+        for row in board:
+            if abs(sum(row)) == 3:
                 return True
-        for col in scoreboard.T:
-            if abs(sum(col)) == 15:
+        for col in board.T:
+            if abs(sum(col)) == 3:
                 return True
-        if abs(np.trace(np.flipud(scoreboard))) == 15:
+        if abs(np.trace(np.flipud(board))) == 3:
             return True
-        if abs(scoreboard.trace()) == 15:
+        if abs(board.trace()) == 3:
             return True
         if self.get_possible_moves(board).size == 0:
             return True
