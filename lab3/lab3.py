@@ -1,6 +1,12 @@
 import numpy as np
 from random import randint
 
+
+def main():
+    game = TicTacToe(3, -1)  # depth = -1 -> random moves
+    game.play(ab_max = False, ab_min = False)  #True -> ab pruning on
+
+
 class TicTacToe:
     def __init__(self, depth_max, depth_min):
         self.states_checked_max = 0
@@ -10,6 +16,7 @@ class TicTacToe:
         self.depth_min = depth_min
         self.evaluation_board = np.array([[3, 2, 3],[2, 4, 2], [3, 2, 3]])
         self.max_turn = True
+
 
     def minimax(self, board, depth, is_maximizing):
         if self.is_over(board) or depth == 0:
@@ -34,8 +41,6 @@ class TicTacToe:
                 values.append(value)
             max_val = max(values)
             final_choice = values.index(max_val)
-            # if depth == self.depth_max: 
-            #     print(f'max: {values}')
             return (max_val, possible_moves[final_choice])
         else:
             for next_board in next_boards:
@@ -43,9 +48,8 @@ class TicTacToe:
                 values.append(value)
             min_val = min(values)
             final_choice = values.index(min_val)
-            # if depth == self.depth_min: 
-            #     print(f'min: {values}')            
             return (min_val, possible_moves[final_choice])
+
 
     def alfa_beta(self, board, depth, is_maximizing, alfa = -np.inf, beta = np.inf):
         if self.is_over(board) or depth == 0:
@@ -73,12 +77,7 @@ class TicTacToe:
                 if alfa >= beta:
                     final_choice = values.index(alfa)
                     return (beta, possible_moves[final_choice])
-                # values.append(value)
-            # max_val = max(values)
-            # if depth == self.depth_max: 
-            #     print(f'max: {values}')   
             final_choice = values.index(alfa)
-            # final_choice = values.index(max_alpha)
             return (alfa, possible_moves[final_choice])
         else:
             beta = np.inf
@@ -90,16 +89,20 @@ class TicTacToe:
                     final_choice = values.index(beta)
                     return (alfa, possible_moves[final_choice])    #chyba niepoczebne
             final_choice = values.index(beta)
-            # if depth == self.depth_min: 
-            #     print(f'min: {values}')            
             return (beta, possible_moves[final_choice])
+
 
     def zero_depth_move(self, is_max):
             choice_board = self.evaluation_board*(1 - abs(self.current_board))
             max_val = max(choice_board.flatten())
             best_moves = np.where(choice_board == max_val)
             move = np.column_stack((best_moves[0], best_moves[1]))[0]
+            if is_max:
+                self.states_checked_max += len(self.get_possible_moves(self.current_board))
+            else:
+                self.states_checked_min += len(self.get_possible_moves(self.current_board))
             self.current_board[move[0]][move[1]] = 1 if is_max else -1
+
 
     def max_move(self, depth_max, ab):
         if depth_max > 0:
@@ -107,6 +110,7 @@ class TicTacToe:
                 _, move = self.alfa_beta(self.current_board, depth_max, True)
             else:
                 _, move = self.minimax(self.current_board, depth_max, True)
+            self.states_checked_max += len(self.get_possible_moves(self.current_board))
             self.current_board[move[0]][move[1]] = 1
         elif depth_max == 0:
             self.zero_depth_move(True)
@@ -116,12 +120,14 @@ class TicTacToe:
             self.current_board[possible_moves[i][0]][possible_moves[i][1]] = 1
         self.max_turn = False
 
+
     def min_move(self, depth_min, ab):
         if depth_min > 0:
             if ab:
                 _, move = self.alfa_beta(self.current_board, depth_min, False)
             else:
                 _, move = self.minimax(self.current_board, depth_min, False)
+            self.states_checked_min += len(self.get_possible_moves(self.current_board))
             self.current_board[move[0]][move[1]] = -1
         elif depth_min == 0:
             self.zero_depth_move(False)
@@ -158,6 +164,7 @@ class TicTacToe:
         else:
             return sum(sum(board * self.evaluation_board))
 
+
     def is_over(self, board):
         for row in board:
             if abs(sum(row)) == 3:
@@ -173,9 +180,11 @@ class TicTacToe:
             return True
         return False
 
+
     def get_possible_moves(self, board):
         result = np.where(board == 0)
         return np.column_stack((result[0], result[1]))
+
 
     def play(self, ab_max, ab_min):
         while not self.is_over(self.current_board):
@@ -191,11 +200,13 @@ class TicTacToe:
             print(f'Max (X) (D = {self.depth_max}, ab_max = {ab_max}) won vs D = {self.depth_min}, ab_min = {ab_min}')
             return (1, self.states_checked_max, self.states_checked_min)
         elif result == -1000:
+            self.print_board() 
             print(f'Min (O) (D = {self.depth_min}, ab_min = {ab_min}) won vs D = {self.depth_max}, ab_max = {ab_max}')
             return (-1, self.states_checked_max, self.states_checked_min)
         else:
             print(f'Draw (Dmax = {self.depth_max} ab_max = {ab_max}, Dmin = {self.depth_min} ab_min = {ab_min})')
             return (0, self.states_checked_max, self.states_checked_min)
+
 
     def print_board(self):
         li = [[' ',' ',' '], [' ',' ',' '], [' ',' ',' ']]
@@ -210,9 +221,7 @@ class TicTacToe:
         for i in range(3):
             print(li[i])
         print('') 
-def main():
-    game = TicTacToe(9, 1)  # depth = -1 -> random moves 
-    game.play(True, False)
+
 
 if __name__ == '__main__':
     main()
