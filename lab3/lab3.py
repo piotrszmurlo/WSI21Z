@@ -3,7 +3,7 @@ from random import randint
 
 
 def main():
-    game = TicTacToe(3, -1)  # depth = -1 -> random moves
+    game = TicTacToe(1, 0)  # depth = -1 -> random moves
     game.play(ab_max = False, ab_min = False)  #True -> ab pruning on
 
 
@@ -51,7 +51,7 @@ class TicTacToe:
             return (min_val, possible_moves[final_choice])
 
 
-    def alfa_beta(self, board, depth, is_maximizing, alfa = -np.inf, beta = np.inf):
+    def alfa_beta(self, board, depth, is_maximizing, alfa=-np.inf, beta=np.inf):
         if self.is_over(board) or depth == 0:
             return (self.evaluate_board(board), None)
         possible_moves = self.get_possible_moves(board)
@@ -200,7 +200,6 @@ class TicTacToe:
             print(f'Max (X) (D = {self.depth_max}, ab_max = {ab_max}) won vs D = {self.depth_min}, ab_min = {ab_min}')
             return (1, self.states_checked_max, self.states_checked_min)
         elif result == -1000:
-            self.print_board() 
             print(f'Min (O) (D = {self.depth_min}, ab_min = {ab_min}) won vs D = {self.depth_max}, ab_max = {ab_max}')
             return (-1, self.states_checked_max, self.states_checked_min)
         else:
