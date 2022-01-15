@@ -5,9 +5,14 @@ import numpy as np
 from random import randint
 from time import sleep as slp
 import matplotlib.pyplot as plt 
+
+MAX_GAMES = 100
+ALPHA = 0.85
+GAMMA = 0.75
+MAX_STEPS = 300
+
 def main():
-    maze, size = create_maze_from_txt()
-    play()
+    play(MAX_GAMES, ALPHA, GAMMA, MAX_STEPS)
 
 def create_maze_from_txt(filename='maze.txt') -> np.ndarray:
     with open(filename, 'r') as file:
@@ -36,7 +41,7 @@ def get_state_id(possible_states, _state) -> int:
 
 def get_reward(possible_states, state, final_state_id) -> int:
     if get_state_id(possible_states, state) == final_state_id:
-        return 10000
+        return 10
     else: 
         return -1
 
@@ -46,7 +51,7 @@ def is_action_possible(possible_states, action, state) -> bool:
         return True
     return False
 
-def play(max_games=200, alpha=0.7, gamma=0.5):
+def play(max_games=100, alpha=0.5, gamma=0.5, max_steps=300):
     maze, maze_size = create_maze_from_txt()
     maze_copy = maze.copy()
     possible_states = get_possible_states(maze)
@@ -57,9 +62,8 @@ def play(max_games=200, alpha=0.7, gamma=0.5):
     Q_table = np.zeros((states_count, len(actions)))
     current_state = np.argwhere(maze == 3)
     game_count = 1
-    max_steps = 150
-    print("\n"*(maze_size[1]+1))
-    UP = f"\x1B[{maze_size[1]+1}A"
+    print("\n"*(maze_size[1]))
+    UP = f"\x1B[{maze_size[1]+5}A"
     CLR = "\x1B[0K"
     epsilon = 1
     steps_str = ''
@@ -91,7 +95,7 @@ def play(max_games=200, alpha=0.7, gamma=0.5):
             if game_count == max_games:
                 steps_str += f"{current_state}->"
                 maze_copy[current_state[0]][current_state[1]] = 5
-                # slp(0.5)
+                slp(0.25)
                 maze_str = str(maze_copy).replace('5', '\033[0m\033[93m*\033[0m\033[96m').replace('1', 'X').replace('0', ' ').replace('.', '')
                 print(f"\033[96m{UP}{maze_str}{CLR}\n\033[0m")
                 maze_copy[current_state[0]][current_state[1]] = 0
@@ -106,7 +110,12 @@ def play(max_games=200, alpha=0.7, gamma=0.5):
             steps_arr[game_count - 1] = steps
         rewards_arr[game_count - 1] = total_reward
         game_count += 1
-    plt.plot(steps_arr)
+
+    fig, ax = plt.subplots()
+    ax.plot(steps_arr, label='liczba kroków')
+    ax.plot(rewards_arr, label='nagroda')
+    ax.set(xlabel='epoka', title=f"alpha={alpha}; gamma={gamma}")
+    ax.legend()
     plt.show()
     print(steps_str[:-2])
 
