@@ -41,7 +41,7 @@ def get_state_id(possible_states, _state) -> int:
 
 def get_reward(possible_states, state, final_state_id) -> int:
     if get_state_id(possible_states, state) == final_state_id:
-        return 10
+        return 100
     else: 
         return -1
 
