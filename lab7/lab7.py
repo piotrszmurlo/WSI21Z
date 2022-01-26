@@ -57,3 +57,17 @@ with open('out.csv', 'w', newline = '') as outFile:
         writer.writerow(row)
     sys.stdout = real_stdout
 
+From data:
+{'studies': 0.6299, 'loneliness': 0.1477, 'overeating': 0.3269, 'depression': 0.3644}
+From distribition:
+{'studies': 0.64, 'loneliness': 0.15, 'overeating': 0.32580000000000003, 'depression': 0.3629}
+Difference:
+{'studies': 0.010099999999999998, 'loneliness': 0.0022999999999999965, 'overeating': 0.0010999999999999899, 'depression': 0.0015000000000000013}
+
+P(depression|overeating) from data:
+0.6267837541163557
+P(depression|overeating) from distribution:
+0.6284375861118766
+P(depression|overeating) difference
+0.001653831995520938
+
