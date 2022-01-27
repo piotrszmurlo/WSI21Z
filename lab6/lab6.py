@@ -20,7 +20,7 @@ def create_maze_from_txt(filename='maze.txt') -> np.ndarray:
         for index, _ in enumerate(input):
             input[index] = _.replace('\n', '')
         size = (len(input), len(input[0]))
-        maze = np.zeros(size)
+        maze = np.zeros(size).astype(int)
         for i, _ in enumerate(maze):
             for j, _ in enumerate(maze[0]):
                 maze[i][j] = input[i][j]

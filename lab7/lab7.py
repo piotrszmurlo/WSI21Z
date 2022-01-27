@@ -2,8 +2,7 @@ import bnlearn as bn
 from pgmpy.factors.discrete import TabularCPD
 import csv
 import numpy as np
-import sys
-import os
+import os, contextlib
 
 N = 10
 
@@ -34,26 +33,67 @@ for node in p_input:
 DAG = bn.make_DAG(edges)
 DAG = bn.make_DAG(DAG, CPD=cpds)
 
-bn.print_CPD(DAG)
+
+with open(os.devnull, 'w') as devnull:
+    with contextlib.redirect_stdout(devnull):
+        with open('out.csv', 'w', newline = '') as outFile:
+            writer = csv.DictWriter(outFile, fieldnames=p_input.keys())
+            writer.writeheader()
+            for n in range(N):
+                row = {}
+                for node in unconditional_nodes:
+                    row[node] = np.random.binomial(1, p_input[node][1][0])
+                for node in p_input:
+                    if node not in unconditional_nodes:
+                        evidence = {}
+                        for edge in edges:
+                            if edge[1] == node:
+                                evidence[edge[0]] = row[edge[0]]
+                        cond_p = bn.inference.fit(DAG, variables=[node], evidence=evidence).df['p'][1]
+                        row[node] = np.random.binomial(1, cond_p)
+                writer.writerow(row)
+
+def check_output(out_filename):
+    with open(out_filename, newline ='') as outFile:
+        output = csv.DictReader(outFile)
+        fieldnames = output.fieldnames
+        p = {}
+        dist_p = {}
+        diff_p = {}
+        for field_name in fieldnames:
+            p[field_name] = 0
+            dist_p[field_name] = bn.inference.fit(DAG, variables=[field_name], evidence={}).df['p'][1]
+        for line in output:
+            for field_name in fieldnames:
+                p[field_name] += int(line[field_name])
+        for key in p:
+            p[key] = p[key] / N
+        print('From data:')
+        print(p)
+        print('From distribition:')
+        print(dist_p)
+        for field_name in fieldnames:
+            diff_p[field_name] = abs(p[field_name] - dist_p[field_name])
+        print('Difference:')
+        print(diff_p)
+        return p
+
+p = check_output('out.csv')
+
+dist_p_depression_overeating = bn.inference.fit(DAG, variables=['overeating'], evidence={'depression' : 1}).df['p'][1]
+
+p_depression_overeating = 0
+with open('out.csv', newline ='') as outFile:
+    output = csv.DictReader(outFile)
+    for line in output:
+        if int(line['depression']) == 1:
+            p_depression_overeating += int(line['overeating'])
+p_depression_overeating = p_depression_overeating/N/p['depression']
 
 
-with open('out.csv', 'w', newline = '') as outFile:
-    writer = csv.DictWriter(outFile, fieldnames=p_input.keys())
-    writer.writeheader()
-    real_stdout = sys.stdout
-    sys.stdout = open(os.devnull, "w")
-    for n in range(1000):
-        row = {}
-        for node in unconditional_nodes:
-            row[node] = np.random.binomial(1, p_input[node][1][0])
-        for node in p_input:
-            if node not in unconditional_nodes:
-                evidence = {}
-                for edge in edges:
-                    if edge[1] == node:
-                        evidence[edge[0]] = row[edge[0]]
-                cond_p = bn.inference.fit(DAG, variables=[node], evidence=evidence).df['p'][1]
-                row[node] = np.random.binomial(1, cond_p)
-        writer.writerow(row)
-    sys.stdout = real_stdout
-
+print("P(depression|overeating) from data:")
+print(p_depression_overeating)
+print("P(depression|overeating) from distribution:")
+print(dist_p_depression_overeating)
+print("P(depression|overeating) difference")
+print(abs(p_depression_overeating - dist_p_depression_overeating))
